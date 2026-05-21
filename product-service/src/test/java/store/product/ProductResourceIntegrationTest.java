@@ -1,5 +1,8 @@
 package store.product;
 
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -35,12 +39,13 @@ class ProductResourceIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
+    @MockitoSpyBean
     private ProductRepository productRepository;
 
     @BeforeEach
     void setUp() {
         productRepository.deleteAll();
+        reset(productRepository);
     }
 
     @Test
@@ -59,6 +64,14 @@ class ProductResourceIntegrationTest {
             .andExpect(jsonPath("$.name").value("Tomato"))
             .andExpect(jsonPath("$.price").value(10.12))
             .andExpect(jsonPath("$.unit").value("kg"));
+    }
+
+    @Test
+    void healthcheckReturnsOk() throws Exception {
+        mockMvc.perform(get("/"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.service").value("product-service"))
+            .andExpect(jsonPath("$.status").value("ok"));
     }
 
     @Test
@@ -90,6 +103,20 @@ class ProductResourceIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(productId.toString()))
             .andExpect(jsonPath("$.name").value("Tomato"));
+    }
+
+    @Test
+    void findByIdUsesCacheOnRepeatedRequests() throws Exception {
+        UUID productId = createProductAndReturnId();
+        reset(productRepository);
+
+        mockMvc.perform(get("/products/{id}", productId))
+            .andExpect(status().isOk());
+
+        mockMvc.perform(get("/products/{id}", productId))
+            .andExpect(status().isOk());
+
+        verify(productRepository, times(1)).findById(productId);
     }
 
     @Test

@@ -3,6 +3,9 @@ package store.product.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     @Transactional
+    @CacheEvict(cacheNames = "products", key = "'all'")
     public ProductOut create(ProductIn productIn) {
         Product product = ProductMapper.toEntity(productIn);
         Product savedProduct = productRepository.save(product);
@@ -28,6 +32,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "products", key = "'all'")
     public List<ProductOut> findAll() {
         return productRepository.findAll(Sort.by(Sort.Direction.ASC, "name"))
             .stream()
@@ -36,6 +41,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productById", key = "#id")
     public ProductOut findById(UUID id) {
         return productRepository.findById(id)
             .map(ProductMapper::toOutput)
@@ -43,6 +49,10 @@ public class ProductService {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(cacheNames = "products", key = "'all'"),
+        @CacheEvict(cacheNames = "productById", key = "#id")
+    })
     public void delete(UUID id) {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new ProductNotFoundException(id));
