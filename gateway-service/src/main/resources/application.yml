@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: accounts
+              uri: ${clients.account-service.url:http://localhost:8083}
+              predicates:
+                - Path=/accounts/**
+            - id: auth
+              uri: ${clients.auth-service.url:http://localhost:8084}
+              predicates:
+                - Path=/auth/**
+            - id: products
+              uri: ${clients.product-service.url:http://localhost:8080}
+              predicates:
+                - Path=/products/**
+            - id: orders
+              uri: ${clients.order-service.url:http://localhost:8081}
+              predicates:
+                - Path=/orders/**
+            - id: exchanges
+              uri: ${clients.exchange-service.url:http://localhost:8000}
+              predicates:
+                - Path=/exchanges/**,/exchange/**
+
+server:
+  port: 8085
+
+gateway:
+  auth-solve-url: ${gateway.auth-solve-url:http://localhost:8084/auth/solve}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

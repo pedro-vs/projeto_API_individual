@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config
+  namespace: store-platform
+data:
+  SPRING_APPLICATION_NAME: auth-service
+  SERVER_PORT: "8084"
+  CLIENTS_ACCOUNT_SERVICE_URL: http://account-service:8083
+  STORE_JWT_DURATION: "86400000"
+  STORE_JWT_HTTP_ONLY: "true"
+  STORE_JWT_SECURE: "false"
+  STORE_JWT_SAME_SITE: Lax
