@@ -87,6 +87,14 @@ class OrderResourceIntegrationTest {
     }
 
     @Test
+    void healthcheckReturnsOk() throws Exception {
+        mockMvc.perform(get("/"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.service").value("order-service"))
+            .andExpect(jsonPath("$.status").value("ok"));
+    }
+
+    @Test
     void findAllReturnsOnlyOrdersFromCurrentAccount() throws Exception {
         UUID firstOrderId = saveOrder("70", LocalDateTime.now().minusHours(1), "26.44", UUID.randomUUID(), 2, "20.24");
         saveOrder("99", LocalDateTime.now().minusHours(2), "11.00", UUID.randomUUID(), 1, "11.00");
