@@ -1,180 +1,49 @@
-# Execucao Local
+# Execucao local
 
-## Subindo a stack completa
-
-O jeito mais rapido de executar o projeto e subir todos os servicos com observabilidade:
+## Subir a stack
 
 ```bash
 docker compose up -d --build
 ```
 
-Servicos publicados:
+Servicos:
 
-- `gateway-service`: <http://localhost:8085>
-- `account-service`: <http://localhost:8083>
-- `auth-service`: <http://localhost:8084>
-- `product-service`: <http://localhost:8080>
-- `order-service`: <http://localhost:8081>
-- `exchange-service`: <http://localhost:8000>
-- `prometheus`: <http://localhost:9090>
-- `grafana`: <http://localhost:3000>
-- `redis`: `localhost:6379`
-- `postgres`: `localhost:5432`
+- `product-service`: porta `8080`.
+- `order-service`: porta `8081`.
+- `exchange-service`: porta `8000`, mock local.
+- `db`: PostgreSQL disponivel na rede interna do Compose.
+- `redis`: Redis disponivel na rede interna do Compose.
 
-Fluxo recomendado:
-
-- usar o `gateway-service` como ponto de entrada para autenticacao e chamadas protegidas.
-
-## Subindo servicos isoladamente
-
-### Account API
-
-```bash
-cd account-service
-export DATABASE_HOST=localhost DATABASE_PORT=5432 DATABASE_DB=store DATABASE_USERNAME=store DATABASE_PASSWORD=store
-./mvnw spring-boot:run
-```
-
-### Auth API
-
-```bash
-cd auth-service
-./mvnw spring-boot:run
-```
-
-### Gateway API
-
-```bash
-cd gateway-service
-./mvnw spring-boot:run
-```
-
-### Product API
-
-```bash
-cd product-service
-export DATABASE_HOST=localhost DATABASE_PORT=5432 DATABASE_DB=store DATABASE_USERNAME=store DATABASE_PASSWORD=store
-export SPRING_CACHE_TYPE=redis REDIS_HOST=localhost REDIS_PORT=6379
-./mvnw spring-boot:run
-```
-
-### Order API
-
-```bash
-cd order-service
-export DATABASE_HOST=localhost DATABASE_PORT=5432 DATABASE_DB=store DATABASE_USERNAME=store DATABASE_PASSWORD=store
-export PRODUCT_SERVICE_URL=http://localhost:8080 EXCHANGE_SERVICE_URL=http://localhost:8000
-./mvnw spring-boot:run
-```
-
-### Exchange API
-
-```bash
-cd exchange-service
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
-
-## Endpoints principais
-
-### Account API
-
-- `POST /accounts`
-- `GET /accounts/{id}`
-- `POST /accounts/search`
-
-### Auth API
-
-- `POST /auth/register`
-- `POST /auth/login`
-- `GET /auth/logout`
-- `POST /auth/solve`
-- `GET /auth/whoami`
-
-### Product API
-
-- `POST /products`
-- `GET /products`
-- `GET /products/{id}`
-- `DELETE /products/{id}`
-
-### Order API
-
-- `POST /orders`
-- `GET /orders`
-- `GET /orders/{id}`
-
-### Exchange API
-
-- `GET /exchanges/{from}/{to}`
-
-## Exemplo de fluxo
-
-Registrar usuario:
-
-```bash
-curl -X POST http://localhost:8085/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Alice",
-    "email": "alice@example.com",
-    "password": "123456"
-  }'
-```
-
-Login e gravacao do cookie:
-
-```bash
-curl -i -c cookies.txt \
-  -X POST http://localhost:8085/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "alice@example.com",
-    "password": "123456"
-  }'
-```
+## Fluxo manual
 
 Criar produto:
 
 ```bash
-curl -b cookies.txt \
-  -X POST http://localhost:8085/products \
+curl -X POST http://localhost:8080/products \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Notebook",
-    "price": 4500.0,
-    "unit": "UN"
-  }'
+  -d '{"name":"Coffee","price":10.50,"unit":"kg"}'
 ```
 
 Criar pedido:
 
 ```bash
-curl -b cookies.txt \
-  -X POST http://localhost:8085/orders \
+curl -X POST http://localhost:8081/orders \
   -H "Content-Type: application/json" \
-  -d '{
-    "items": [
-      {
-        "idProduct": "PRODUCT_ID",
-        "quantity": 2
-      }
-    ]
-  }'
+  -H "id-account: demo-user" \
+  -d '{"items":[{"idProduct":"ID_DO_PRODUTO","quantity":2}]}'
 ```
 
-Consultar pedido com conversao:
+## Validacao automatizada
 
 ```bash
-curl -b cookies.txt \
-  "http://localhost:8085/orders/ORDER_ID?currency=BRL"
+./scripts/check-local.sh
 ```
 
-## Grafana
+## Observabilidade opcional
 
-Login padrao:
+```bash
+docker compose --profile observability up -d --build
+```
 
-- usuario: `admin`
-- senha: `admin`
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:3000`

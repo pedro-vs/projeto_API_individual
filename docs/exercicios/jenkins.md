@@ -1,45 +1,24 @@
 # Jenkins
 
-## Objetivo
+Cada microservico possui um `Jenkinsfile` proprio:
 
-Preparar uma pipeline de CI/CD por microservico com build, publicacao de imagem e deploy em Kubernetes.
-
-## Entregue
-
-Cada servico do repositorio possui seu proprio `Jenkinsfile`:
-
-- `account-service/Jenkinsfile`
-- `auth-service/Jenkinsfile`
-- `gateway-service/Jenkinsfile`
 - `product-service/Jenkinsfile`
 - `order-service/Jenkinsfile`
-- `exchange-service/Jenkinsfile`
 
-## Estagios padronizados
+## Pipeline
 
-- `SCM`
-- `Dependencies`
-- `Build`
-- `Push to Docker Hub`
-- `Deploy to K8s`
+As pipelines seguem o mesmo fluxo:
 
-## Artefatos de suporte
+- checkout do codigo.
+- download de dependencias Maven.
+- build e testes com `./mvnw -B clean verify`.
+- build de imagem Docker multi-plataforma.
+- push da imagem para Docker Hub.
+- deploy em Kubernetes usando `kubeconfig`.
 
-- `Dockerfile` por servico
-- manifests Kubernetes por servico
-- namespace compartilhado em `k8s/namespace.yaml`
-- `compose.yaml` para validar a stack localmente antes do deploy
+## Credenciais esperadas no Jenkins
 
-## Credenciais esperadas
+- `dockerhub-credential`: usuario e token do Docker Hub.
+- `kubeconfig`: arquivo de acesso ao cluster Kubernetes.
+- `DOCKERHUB_NAMESPACE`: namespace onde as imagens serao publicadas.
 
-- `dockerhub-credential`
-- `kubeconfig`
-
-## Variaveis esperadas
-
-- `DOCKERHUB_NAMESPACE`
-
-## Aderencia ao enunciado
-
-- Os servicos pedidos literalmente em `Jenkins` estao presentes: `account-service`, `auth-service`, `gateway-service`, `product-service` e `order-service`.
-- O repositorio tambem mantem `exchange-service`, implementado na etapa especifica de `Exchange API`, com pipeline propria para manter a stack completa versionada.

@@ -1,40 +1,26 @@
 # Bottlenecks
 
-## Objetivo
+## 1. Cache na Product API
 
-Implementar ao menos dois tratamentos de gargalo relevantes para a aplicacao.
+A Product API usa Redis com Spring Cache para reduzir leituras repetidas no banco.
 
-## Bottlenecks escolhidos
+- Cache de listagem de produtos.
+- Cache de consulta por ID.
+- Invalidacao ao criar ou remover produtos.
 
-### `Caching`
+## 2. HPA em Kubernetes
 
-- Implementado no `product-service`
-- Redis como armazenamento em memoria
-- `GET /products` cacheado com chave `all`
-- `GET /products/{id}` cacheado por `UUID`
+Product API e Order API possuem `HorizontalPodAutoscaler`.
 
-Arquivos principais:
+- Replica minima: 1.
+- Replica maxima: 4.
+- Escala por uso medio de CPU.
 
-- `product-service/src/main/java/store/product/config/CacheConfig.java`
-- `product-service/src/main/java/store/product/service/ProductService.java`
-- `product-service/src/main/resources/application.properties`
+## 3. Observabilidade
 
-### `Observability`
+Os servicos Java expoem metricas via Spring Actuator e Prometheus:
 
-- `account-service`, `auth-service`, `gateway-service`, `product-service` e `order-service` com actuator + Micrometer Prometheus
-- `exchange-service` com `prometheus-fastapi-instrumentator`
-- `compose.yaml` com Prometheus e Grafana
-- datasource do Grafana provisionado automaticamente
+- `GET /actuator/prometheus`
+- tags de aplicacao por microservico
+- suporte a Prometheus/Grafana
 
-Arquivos principais:
-
-- `compose.yaml`
-- `observability/prometheus/prometheus.yml`
-- `observability/grafana/provisioning/datasources/datasources.yml`
-- `exchange-service/app/main.py`
-
-## Resultado pratico
-
-- reducao do custo de leitura repetida no `product-service`
-- metricas de aplicacao disponiveis para inspecao
-- stack observavel localmente sem configuracao manual adicional

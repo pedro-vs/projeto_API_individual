@@ -1,46 +1,21 @@
-# Projeto API Individual
+# Projeto Individual
 
-Este repositorio consolida a entrega individual das etapas de microservices da disciplina **Platforms, Microservices, DevOps and APIs**. O projeto foi organizado como uma loja simples com a trusted layer completa e um servico externo de cambio:
+Esta documentacao descreve a entrega individual de **Product API** e **Order API**.
 
-- `account-service`: cadastro de contas e validacao de credenciais.
-- `auth-service`: emissao e resolucao de JWT.
-- `gateway-service`: entrada unica da aplicacao.
-- `product-service`: cadastro e consulta de produtos.
-- `order-service`: criacao e consulta de pedidos por conta.
-- `exchange-service`: consulta de cotacoes para conversao de moeda.
+O repositorio contem os dois microservicos implementados em Spring Boot, testes automatizados, Dockerfiles, manifests Kubernetes, Jenkinsfiles, documentacao MkDocs e arquivos de suporte para execucao local.
 
-## Status da entrega
+## APIs implementadas
 
-| Area | Status | Evidencia |
+| API | Diretorio | Responsabilidade |
 | --- | --- | --- |
-| APIs base | Concluida | `account-service`, `auth-service`, `gateway-service`, `product-service`, `order-service` e `exchange-service` respondendo localmente |
-| CI/CD | Concluida no repositorio | `Jenkinsfile` por servico e `Dockerfile` versionados |
-| Kubernetes | Concluida no repositorio e validada localmente | manifests separados por servico, PostgreSQL, Redis e scripts de deploy |
-| Bottlenecks | Concluida | Redis cache + Prometheus + Grafana |
-| Documentacao | Concluida | Este site em `MkDocs` com publicacao por `GitHub Pages` |
+| Product API | `product-service/` | Cadastro, consulta, listagem, remocao e cache de produtos |
+| Order API | `order-service/` | Criacao e consulta de pedidos, integrando Product API e Exchange API |
 
-## O que esta documentado aqui
+## Destaques
 
-- Visao geral da entrega individual.
-- Arquitetura e integracoes entre servicos.
-- Como executar a stack local com `docker compose`.
-- Como validar testes, endpoints, metricas e cluster local.
-- Resumo de cada exercicio pedido na sequencia individual.
+- Persistencia em PostgreSQL com Flyway.
+- Testes automatizados com H2 em profile de teste.
+- Cache Redis na Product API.
+- Metricas Prometheus via Spring Actuator.
+- Manifests Kubernetes com requests, limits e HPA.
 
-## Stack utilizada
-
-| Componente | Tecnologia |
-| --- | --- |
-| APIs Java | Spring Boot 3.5, Maven, JPA, PostgreSQL, Flyway |
-| API Python | FastAPI, Uvicorn |
-| Cache | Redis |
-| Observabilidade | Prometheus, Grafana, Micrometer |
-| Containers | Docker, Docker Compose |
-| Orquestracao | Kubernetes local com `kind` ou `minikube` |
-| Documentacao | MkDocs Material |
-
-## Navegacao rapida
-
-- A pagina [Entrega](entrega.md) resume os itens pedidos no handout.
-- A secao [Projeto](projeto/arquitetura.md) descreve arquitetura, execucao e validacao.
-- A secao [Exercicios](exercicios/product-api.md) registra cada etapa implementada.

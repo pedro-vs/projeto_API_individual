@@ -1,75 +1,41 @@
-name: store
-
 services:
   db:
     image: postgres:17-alpine
-    hostname: db
     environment:
       POSTGRES_DB: store
       POSTGRES_USER: store
-      POSTGRES_PASSWORD: store
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: devpass
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U store -d store"]
       interval: 5s
       timeout: 5s
-      retries: 12
+      retries: 10
 
   redis:
     image: redis:7-alpine
-    hostname: redis
-    ports:
-      - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
-      timeout: 3s
-      retries: 12
+      timeout: 5s
+      retries: 10
 
-  account-service:
+  exchange-service:
     build:
-      context: ./account-service
-    hostname: account-service
-    environment:
-      DATABASE_HOST: db
-      DATABASE_PORT: 5432
-      DATABASE_DB: store
-      DATABASE_USERNAME: store
-      DATABASE_PASSWORD: store
+      context: ./support/mock-exchange
     ports:
-      - "8083:8083"
-    depends_on:
-      db:
-        condition: service_healthy
-
-  auth-service:
-    build:
-      context: ./auth-service
-    hostname: auth-service
-    environment:
-      CLIENTS_ACCOUNT_SERVICE_URL: http://account-service:8083
-      STORE_JWT_HTTP_ONLY: "true"
-      STORE_JWT_SECURE: "false"
-      STORE_JWT_SAME_SITE: Lax
-    ports:
-      - "8084:8084"
-    depends_on:
-      account-service:
-        condition: service_started
+      - "8000:8000"
 
   product-service:
     build:
       context: ./product-service
-    hostname: product-service
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       DATABASE_DB: store
       DATABASE_USERNAME: store
-      DATABASE_PASSWORD: store
+      DATABASE_PASSWORD: devpass
       SPRING_CACHE_TYPE: redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -84,13 +50,12 @@ services:
   order-service:
     build:
       context: ./order-service
-    hostname: order-service
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       DATABASE_DB: store
       DATABASE_USERNAME: store
-      DATABASE_PASSWORD: store
+      DATABASE_PASSWORD: devpass
       PRODUCT_SERVICE_URL: http://product-service:8080
       EXCHANGE_SERVICE_URL: http://exchange-service:8000
     ports:
@@ -103,75 +68,31 @@ services:
       exchange-service:
         condition: service_started
 
-  exchange-service:
-    build:
-      context: ./exchange-service
-    hostname: exchange-service
-    ports:
-      - "8000:8000"
-
-  gateway-service:
-    build:
-      context: ./gateway-service
-    hostname: gateway-service
-    environment:
-      CLIENTS_ACCOUNT_SERVICE_URL: http://account-service:8083
-      CLIENTS_AUTH_SERVICE_URL: http://auth-service:8084
-      CLIENTS_PRODUCT_SERVICE_URL: http://product-service:8080
-      CLIENTS_ORDER_SERVICE_URL: http://order-service:8081
-      CLIENTS_EXCHANGE_SERVICE_URL: http://exchange-service:8000
-      GATEWAY_AUTH_SOLVE_URL: http://auth-service:8084/auth/solve
-    ports:
-      - "8085:8085"
-    depends_on:
-      account-service:
-        condition: service_started
-      auth-service:
-        condition: service_started
-      product-service:
-        condition: service_started
-      order-service:
-        condition: service_started
-      exchange-service:
-        condition: service_started
-
   prometheus:
-    image: prom/prometheus:latest
-    hostname: prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-    ports:
-      - "9090:9090"
+    image: prom/prometheus:v3.0.1
+    profiles:
+      - observability
     volumes:
       - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
     depends_on:
-      account-service:
-        condition: service_started
-      auth-service:
-        condition: service_started
-      gateway-service:
-        condition: service_started
-      product-service:
-        condition: service_started
-      order-service:
-        condition: service_started
-      exchange-service:
-        condition: service_started
+      - product-service
+      - order-service
 
   grafana:
-    image: grafana/grafana-enterprise
-    hostname: grafana
+    image: grafana/grafana:11.3.1
+    profiles:
+      - observability
     environment:
+      GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
     ports:
       - "3000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
     depends_on:
-      prometheus:
-        condition: service_started
+      - prometheus
 
 volumes:
-  grafana-data:
   postgres-data:

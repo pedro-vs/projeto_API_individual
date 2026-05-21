@@ -2,36 +2,23 @@
 
 ## Identificacao
 
-- Aluno: `Pedro Henrique Vargas Sepulveda`
-- Repositorio: [`pedro-vs/projeto_API_individual`](https://github.com/pedro-vs/projeto_API_individual)
+- Aluno: Pedro Henrique Vargas Sepulveda
+- Grupo: projeto em grupo com dois integrantes
+- Entrega individual: Product API e Order API
+- Repositorio individual: <https://github.com/pedro-vs/projeto_API_individual>
 
-## Itens cobertos nesta documentacao
+## Itens da rubrica
 
-- Nome do aluno e identificacao da entrega.
-- Documentacao das atividades realizadas em cada exercicio individual.
-- Codigo-fonte do projeto no mesmo repositorio.
-- Arquitetura, execucao local, observabilidade e validacao.
-- Link do repositorio principal utilizado na entrega.
-- Destaques dos bottlenecks implementados.
+- Nome do aluno e grupo: documentado nesta pagina.
+- Documentacao das atividades realizadas: paginas de Product API, Order API, Jenkins, MiniKube e Bottlenecks.
+- Codigo fonte das atividades realizadas: `product-service/` e `order-service/`.
+- Documentacao do projeto: arquitetura, execucao local e validacao.
+- Codigo fonte do projeto: microservicos, Dockerfiles, Jenkinsfiles e manifests.
+- Links para repositorios utilizados: repositorio individual e repositorio do projeto em grupo quando publicado.
+- Bottlenecks implementados: cache Redis, HPA, metricas Prometheus e uso de banco relacional com Flyway.
+- Apresentacao e video: pendentes de publicacao externa antes da entrega final.
 
-## Links importantes
+## Observacao sobre Exchange API
 
-- Repositorio do projeto: <https://github.com/pedro-vs/projeto_API_individual>
-- Handout da disciplina: <https://insper.github.io/platform/versions/2026.1/>
-- Sequencia individual:
-  - <https://insper.github.io/platform/exercises/product/>
-  - <https://insper.github.io/platform/exercises/order/>
-  - <https://insper.github.io/platform/exercises/exchange/>
-  - <https://insper.github.io/platform/exercises/jenkins/>
-  - <https://insper.github.io/platform/exercises/minikube/>
-  - <https://insper.github.io/platform/exercises/bottlenecks/>
+A Order API consome a Exchange API quando a consulta de pedido usa o parametro `currency`. Para a entrega individual, o repositorio inclui um `support/mock-exchange` apenas para validacao local; a implementacao real da Exchange API fica no repositorio do outro integrante.
 
-## Apresentacao e video
-
-- Slides: pendente de publicacao externa.
-- Video: pendente de publicacao externa.
-
-## Bottlenecks destacados
-
-- `Caching`: o `product-service` usa Redis com `Spring Cache` para reduzir leituras repetidas no banco.
-- `Observability`: `account-service`, `auth-service`, `gateway-service`, `product-service` e `order-service` expoem metricas para Prometheus, e `exchange-service` expoe `GET /metrics`, com Grafana provisionado para consulta.

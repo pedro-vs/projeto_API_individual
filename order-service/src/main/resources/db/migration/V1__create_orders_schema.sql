@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS orders;
 CREATE TABLE IF NOT EXISTS orders.orders (
     id UUID PRIMARY KEY,
     account_id VARCHAR(255) NOT NULL,
-    date TIMESTAMP(6) NOT NULL,
+    date TIMESTAMP NOT NULL,
     total NUMERIC(10, 2) NOT NULL
 );
 
@@ -20,5 +20,8 @@ CREATE TABLE IF NOT EXISTS orders.order_items (
         ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_orders_account_id ON orders.orders (account_id);
-CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON orders.order_items (order_id);
+CREATE INDEX IF NOT EXISTS idx_orders_account_date
+    ON orders.orders (account_id, date);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_order
+    ON orders.order_items (order_id);
