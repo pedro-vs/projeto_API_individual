@@ -168,6 +168,9 @@ venv.bak/
 # mkdocs documentation
 /site
 
+# Local Kubernetes tooling downloaded by scripts/k8s/install-kind.sh
+scripts/k8s/bin/
+
 # mypy
 .mypy_cache/
 .dmypy.json
