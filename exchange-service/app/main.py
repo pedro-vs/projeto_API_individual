@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import Depends, FastAPI, Header
 from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.exceptions import (
     UnauthorizedRequestError,
@@ -12,6 +15,10 @@ from app.models import ExchangeOut, HealthOut, ProblemOut
 from app.services.exchange_service import ExchangeService
 
 app = FastAPI(title="exchange-service", version="0.1.0")
+Instrumentator(excluded_handlers=["/metrics"]).instrument(app).expose(
+    app,
+    include_in_schema=False,
+)
 
 
 def get_exchange_service() -> ExchangeService:
@@ -59,7 +66,7 @@ def healthcheck() -> HealthOut:
 def get_exchange(
     from_currency: str,
     to_currency: str,
-    id_account: str | None = Header(default=None, alias="id-account"),
+    id_account: Optional[str] = Header(default=None, alias="id-account"),
     service: ExchangeService = Depends(get_exchange_service),
 ) -> ExchangeOut:
     return service.get_exchange(from_currency, to_currency, id_account)

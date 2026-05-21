@@ -95,3 +95,10 @@ def test_get_exchange_returns_bad_gateway_when_provider_fails() -> None:
 
     assert response.status_code == 502
     assert response.json()["title"] == "Exchange provider unavailable"
+
+
+def test_metrics_endpoint_is_exposed() -> None:
+    response = client.get("/metrics")
+
+    assert response.status_code == 200
+    assert "http_requests_total" in response.text

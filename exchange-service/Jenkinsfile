@@ -1,0 +1,96 @@
+pipeline {
+    agent any
+
+    environment {
+        SERVICE_NAME = 'exchange-service'
+        WORKDIR = 'exchange-service'
+        K8S_NAMESPACE = 'store-platform'
+        VENV_DIR = '.venv-jenkins'
+    }
+
+    stages {
+        stage('SCM') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Dependencies') {
+            steps {
+                dir(env.WORKDIR) {
+                    sh '''
+                        python3 -m venv "$VENV_DIR"
+                        . "$VENV_DIR/bin/activate"
+                        python -m pip install -r requirements-dev.txt
+                    '''
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir(env.WORKDIR) {
+                    sh '''
+                        . "$VENV_DIR/bin/activate"
+                        pytest -q
+                    '''
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                dir(env.WORKDIR) {
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'dockerhub-credential',
+                            usernameVariable: 'DOCKERHUB_USERNAME',
+                            passwordVariable: 'DOCKERHUB_TOKEN'
+                        )
+                    ]) {
+                        sh '''
+                            : "${DOCKERHUB_NAMESPACE:?Set DOCKERHUB_NAMESPACE in Jenkins environment variables}"
+                            docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_TOKEN"
+                            docker buildx rm --force "multi-platform-builder-${SERVICE_NAME}" || true
+                            docker buildx create --use --platform=linux/arm64,linux/amd64 --name "multi-platform-builder-${SERVICE_NAME}"
+                            docker buildx inspect --bootstrap
+                            docker buildx build \
+                              --platform=linux/arm64,linux/amd64 \
+                              --push \
+                              --tag "${DOCKERHUB_NAMESPACE}/${SERVICE_NAME}:latest" \
+                              --tag "${DOCKERHUB_NAMESPACE}/${SERVICE_NAME}:${BUILD_ID}" \
+                              -f Dockerfile .
+                            docker buildx rm --force "multi-platform-builder-${SERVICE_NAME}"
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to K8s') {
+            steps {
+                dir(env.WORKDIR) {
+                    withCredentials([
+                        file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')
+                    ]) {
+                        sh '''
+                            : "${DOCKERHUB_NAMESPACE:?Set DOCKERHUB_NAMESPACE in Jenkins environment variables}"
+                            export KUBECONFIG="$KUBECONFIG_FILE"
+                            kubectl apply -f ../k8s/namespace.yaml
+                            kubectl apply -f ../k8s/postgres
+                            kubectl apply -f ../k8s/redis
+                            kubectl -n "$K8S_NAMESPACE" rollout status deployment/postgres --timeout=180s
+                            kubectl -n "$K8S_NAMESPACE" rollout status deployment/redis --timeout=180s
+                            for manifest in configmap.yaml secrets.yaml deployment.yaml service.yaml hpa.yaml; do
+                              if [ -f "k8s/$manifest" ]; then
+                                sed "s|IMAGE_PLACEHOLDER|${DOCKERHUB_NAMESPACE}/${SERVICE_NAME}:${BUILD_ID}|g" "k8s/$manifest" | kubectl apply -f -
+                              fi
+                            done
+                            kubectl -n "$K8S_NAMESPACE" rollout status deployment/"$SERVICE_NAME" --timeout=180s
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}

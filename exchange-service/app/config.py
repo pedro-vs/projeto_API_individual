@@ -8,6 +8,7 @@ class Settings:
         "AWESOME_API_BASE_URL",
         "https://economia.awesomeapi.com.br/json/last",
     )
+    awesome_api_key: str = os.getenv("AWESOME_API_KEY", "")
     awesome_api_timeout_seconds: float = float(
         os.getenv("AWESOME_API_TIMEOUT_SECONDS", "5")
     )
