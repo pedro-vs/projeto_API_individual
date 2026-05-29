@@ -1,21 +1,43 @@
-# Projeto Individual
+# Entrega Individual - Pedro Henrique Vargas Sepulveda
 
-Esta documentacao descreve a entrega individual de **Product API** e **Order API**.
+Este site documenta a entrega individual da disciplina **Platforms, Microservices, DevOps and APIs**.
 
-O repositorio contem os dois microservicos implementados em Spring Boot, testes automatizados, Dockerfiles, manifests Kubernetes, Jenkinsfiles, documentacao MkDocs e arquivos de suporte para execucao local.
+## Identificacao
 
-## APIs implementadas
+| Item | Valor |
+| --- | --- |
+| Aluno | Pedro Henrique Vargas Sepulveda |
+| Grupo | Pedro Henrique Vargas Sepulveda e Raphael Cimerman Lafer |
+| Microservicos individuais | `product-service` e `order-service` |
+| Repositorio individual | `pedro-vs/projeto_API_individual` |
+| Projeto em grupo | `insper-aulas/micro_api_26.1` |
 
-| API | Diretorio | Responsabilidade |
+## Conteudo deste repositorio
+
+- Codigo fonte do `product-service`.
+- Codigo fonte do `order-service`.
+- Testes automatizados das duas APIs.
+- Dockerfile, Jenkinsfile e manifests Kubernetes dos microservicos.
+- Documentacao individual em MkDocs.
+- Links para o projeto em grupo e para os repositorios usados.
+
+## Status da entrega
+
+| Area | Status | Evidencia |
 | --- | --- | --- |
-| Product API | `product-service/` | Cadastro, consulta, listagem, remocao e cache de produtos |
-| Order API | `order-service/` | Criacao e consulta de pedidos, integrando Product API e Exchange API |
+| Product API | Feito | `product-service`, testes, Dockerfile, Jenkinsfile e `k8s/` |
+| Order API | Feito | `order-service`, testes, Dockerfile, Jenkinsfile e `k8s/` |
+| Documentacao individual | Feito | Este site MkDocs |
+| Projeto em grupo | Feito em conjunto | Documentado no repositorio `micro_api_26.1` |
+| Bottlenecks | Feito | Cache no Product Service e HPA/observabilidade no projeto |
+| AWS/EKS | Feito no projeto em grupo | Evidencias centralizadas na documentacao do grupo |
 
-## Destaques
+## Navegacao sugerida
 
-- Persistencia em PostgreSQL com Flyway.
-- Testes automatizados com H2 em profile de teste.
-- Cache Redis na Product API.
-- Metricas Prometheus via Spring Actuator.
-- Manifests Kubernetes com requests, limits e HPA.
-
+- [Entrega](entrega.md): resumo objetivo da entrega individual.
+- [Criterios](criterios.md): requisitos usados para organizar o envio.
+- [Atividades](atividades.md): atividades realizadas por mim.
+- [Product API](product.md): documentacao do `product-service`.
+- [Order API](order.md): documentacao do `order-service`.
+- [Projeto em Grupo](projeto.md): relacao com o projeto completo.
+- [Bottlenecks](bottlenecks.md): gargalos tratados e evidencias.

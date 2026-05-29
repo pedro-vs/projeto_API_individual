@@ -1,26 +1,50 @@
 # Bottlenecks
 
-## 1. Cache na Product API
+## Objetivo
 
-A Product API usa Redis com Spring Cache para reduzir leituras repetidas no banco.
+Implementar ao menos dois tratamentos de gargalo relevantes para a aplicacao.
 
-- Cache de listagem de produtos.
-- Cache de consulta por ID.
-- Invalidacao ao criar ou remover produtos.
+## Bottlenecks escolhidos
 
-## 2. HPA em Kubernetes
+### `Caching`
 
-Product API e Order API possuem `HorizontalPodAutoscaler`.
+- Implementado no `product-service`
+- Redis como armazenamento em memoria
+- `GET /products` cacheado com chave `all`
+- `GET /products/{id}` cacheado por `UUID`
 
-- Replica minima: 1.
-- Replica maxima: 4.
-- Escala por uso medio de CPU.
+Arquivos principais:
 
-## 3. Observabilidade
+- `product-service/src/main/java/store/product/config/CacheConfig.java`
+- `product-service/src/main/java/store/product/service/ProductService.java`
+- `product-service/src/main/resources/application.properties`
 
-Os servicos Java expoem metricas via Spring Actuator e Prometheus:
+### `Observability`
 
-- `GET /actuator/prometheus`
-- tags de aplicacao por microservico
-- suporte a Prometheus/Grafana
+- `account-service`, `auth-service`, `gateway-service`, `product-service` e `order-service` com actuator + Micrometer Prometheus
+- `exchange-service` com `prometheus-fastapi-instrumentator`
+- `compose.yaml` com Prometheus e Grafana
+- datasource do Grafana provisionado automaticamente
 
+Arquivos principais:
+
+- `compose.yaml`
+- `observability/prometheus/prometheus.yml`
+- `observability/grafana/provisioning/datasources/datasources.yml`
+- `exchange-service/app/main.py`
+
+## Resultado pratico
+
+- reducao do custo de leitura repetida no `product-service`
+- metricas de aplicacao disponiveis para inspecao
+- stack observavel localmente sem configuracao manual adicional
+
+## Escalabilidade
+
+O projeto tambem possui `HorizontalPodAutoscaler` nos servicos com maior chance de pressao durante teste de carga:
+
+- `gateway-service`
+- `product-service`
+- `order-service`
+
+O teste de carga com `k6` fica em `load-testing/k6/gateway-flow.js` e pode ser executado com `scripts/load-testing/run-k6.sh`.

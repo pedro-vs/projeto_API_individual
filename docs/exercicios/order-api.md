@@ -1,31 +1,48 @@
 # Order API
 
-A Order API implementa criacao e consulta de pedidos vinculados a uma conta autenticada.
+## Objetivo
 
-## Endpoints
+Implementar o microservico de pedidos integrando com o microservico de produtos e respeitando o header `id-account` como identidade do usuario.
 
-- `POST /orders`: cria pedido para o usuario informado no header `id-account`.
-- `GET /orders`: lista pedidos do usuario.
-- `GET /orders/{id}`: consulta detalhes do pedido.
-- `GET /orders/{id}?currency=BRL`: converte totais usando Exchange API.
-- `GET /`: healthcheck simples.
-- `GET /actuator/prometheus`: metricas para Prometheus.
+## Entregue
 
-## Implementacao
+- `POST /orders`
+- `GET /orders`
+- `GET /orders/{id}`
+- filtro de pedidos por conta
+- conversao opcional de moeda em `GET /orders/{id}?currency=BRL`
+- tratamento de `401`, `400`, `404` e `422`
+- healthcheck em `GET /`
 
-- Spring Boot com Java 21.
-- OpenFeign para consumir Product API e Exchange API.
-- PostgreSQL em runtime.
-- Flyway para criacao do schema `orders`.
-- H2 e mocks em testes automatizados.
-- Tratamento de erros para produto inexistente, pedido inexistente, moeda invalida e falhas externas.
+## Regras principais
+
+- cada pedido pertence a um `id-account`
+- a criacao do pedido valida os produtos consultando o `product-service`
+- totais sao calculados no `order-service`
+- a moeda padrao da resposta detalhada e `USD`
 
 ## Arquivos principais
 
 - `order-service/src/main/java/store/order/resource/OrderResource.java`
 - `order-service/src/main/java/store/order/service/OrderService.java`
-- `order-service/src/main/java/store/order/integration/ProductGateway.java`
-- `order-service/src/main/java/store/order/integration/ExchangeGateway.java`
-- `order-service/src/main/resources/db/migration/V1__create_orders_schema.sql`
-- `order-service/src/test/java/store/order/OrderResourceIntegrationTest.java`
+- `order-service/src/main/java/store/order/service/OrderMapper.java`
+- `order-service/src/main/java/store/order/config/FeignHeaderPropagationConfig.java`
+- `order-service/src/main/java/store/order/exception/RestExceptionHandler.java`
 
+## Cobertura de testes
+
+Casos exercitados:
+
+- criacao bem-sucedida de pedido
+- listagem por conta
+- consulta detalhada em `USD`
+- conversao para outra moeda
+- `404` para pedido de outra conta
+- `400` para produto invalido
+- `422` para moeda invalida
+- `401` sem header de conta
+- healthcheck
+
+Arquivo:
+
+- `order-service/src/test/java/store/order/OrderResourceIntegrationTest.java`
