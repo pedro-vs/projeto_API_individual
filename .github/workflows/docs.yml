@@ -34,4 +34,7 @@ jobs:
         run: mkdocs build --strict
 
       - name: Publish to gh-pages
-        run: mkdocs gh-deploy --force --remote-branch gh-pages --message "docs: deploy individual site"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdocs gh-deploy --force --remote-branch gh-pages --message "docs: deploy individual site"
