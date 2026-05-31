@@ -42,6 +42,11 @@ Portas principais:
 - Mock Exchange: http://localhost:8000
 - PostgreSQL e Redis ficam disponiveis apenas na rede interna do Docker Compose.
 
+Swagger UI:
+
+- Product API: http://localhost:8080/swagger-ui.html
+- Order API: http://localhost:8081/swagger-ui.html
+
 ## Documentacao
 
 ```bash

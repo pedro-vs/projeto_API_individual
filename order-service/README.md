@@ -28,6 +28,8 @@ docker compose up -d --build db product-service exchange-service order-service
 - `GET /orders`
 - `GET /orders/{id}`
 
+Swagger UI: http://localhost:8081/swagger-ui.html
+
 ## Testes
 
 ```bash

@@ -29,6 +29,8 @@ docker compose up -d --build db redis product-service
 - `GET /products/{id}`
 - `DELETE /products/{id}`
 
+Swagger UI: http://localhost:8080/swagger-ui.html
+
 ## Testes
 
 ```bash
