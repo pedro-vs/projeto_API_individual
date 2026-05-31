@@ -1,7 +1,9 @@
 package store.product.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,7 +39,7 @@ public class ProductService {
         return productRepository.findAll(Sort.by(Sort.Direction.ASC, "name"))
             .stream()
             .map(ProductMapper::toOutput)
-            .toList();
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Transactional(readOnly = true)
