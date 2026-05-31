@@ -1,11 +1,10 @@
 # Apresentacao
 
-Esta pagina reserva os links finais da apresentacao e do video do projeto.
+Esta pagina registra o video da apresentacao individual do projeto.
 
 ## Links
 
-- Slides: pendente de publicacao externa.
-- Video: pendente de publicacao externa.
+- Video: <https://youtu.be/uk1mvr0giKE>
 - Documentacao do grupo: <https://insper-aulas.github.io/micro_api_26.1/>
 
 ## Roteiro individual

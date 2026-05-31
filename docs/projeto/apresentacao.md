@@ -1,6 +1,6 @@
 # Apresentacao
 
-Esta pagina serve como roteiro para os slides e para o video final.
+Esta pagina serve como roteiro para o video final.
 
 ## Estrutura sugerida
 
@@ -37,9 +37,7 @@ Para tratar bottlenecks, usamos cache com Redis e observabilidade com Prometheus
 Por fim, executamos teste de carga com k6 e observamos o HPA escalando os servicos.
 ```
 
-## Pendencias externas
+## Evidencias
 
-- Link dos slides.
-- Link do video publicado.
+- Video publicado: <https://youtu.be/uk1mvr0giKE>
 - Prints ou gravacao do HPA escalando.
-

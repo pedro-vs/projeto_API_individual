@@ -16,7 +16,7 @@ Esta pagina cruza a entrega individual com os requisitos das paginas do projeto,
 | Load Testing/HPA | Grupo | Teste e evidencias concentrados no repositorio agregador |
 | Costs & PaaS | Grupo | Documentacao e estimativa no site do grupo |
 | Bottlenecks | Feito | Cache em produto, HPA e metricas nos servicos |
-| Apresentacao e video | Pendente de link | Pagina reservada para anexar links finais |
+| Apresentacao e video | Feito | [Video individual publicado](https://youtu.be/uk1mvr0giKE) |
 | Uso de IA | Documentado | Ver [Uso de IA](uso-ia.md) |
 
 ## Interpretacao para a entrega individual
@@ -25,6 +25,5 @@ Nao e necessario criar uma AWS separada para cada aluno. A infraestrutura AWS/EK
 
 ## Riscos para 100%
 
-- Inserir links finais de slides e video quando forem publicados.
 - Confirmar que o GitHub Pages do repositorio individual foi ativado apos o push para `main`.
 - Garantir que o link individual tambem esteja listado na documentacao do grupo.

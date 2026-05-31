@@ -31,8 +31,8 @@
 | Codigo fonte do projeto | Feito | [Repositorios](repositorios.md) |
 | Links para repositorios utilizados | Feito | [Repositorios](repositorios.md) |
 | Bottlenecks implementados | Feito | [Bottlenecks](bottlenecks.md) |
-| Apresentacao do projeto | Pendente de link externo | [Apresentacao](apresentacao.md) |
-| Video de apresentacao | Pendente de link externo | [Apresentacao](apresentacao.md) |
+| Apresentacao do projeto | Feito | [Apresentacao](apresentacao.md) |
+| Video de apresentacao | Feito | [Video publicado](https://youtu.be/uk1mvr0giKE) |
 | Uso de IA documentado | Feito | [Uso de IA](uso-ia.md) |
 
 ## Links importantes
@@ -51,10 +51,9 @@
   - <https://insper.github.io/platform/2026.1/exercises/project/costs/>
   - <https://insper.github.io/platform/2026.1/exercises/project/presentation/>
 
-## Apresentacao e video
+## Video da apresentacao
 
-- Slides: pendente de publicacao externa.
-- Video: pendente de publicacao externa.
+- Video: <https://youtu.be/uk1mvr0giKE>
 - Roteiro: documentado em [Apresentacao](apresentacao.md).
 
 ## Bottlenecks destacados
